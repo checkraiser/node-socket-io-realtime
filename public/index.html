@@ -1,0 +1,48 @@
+<DOCTYPE html>
+<html>
+    <head>
+        <title>Controller</title>
+        <link rel="stylesheet" type="text/css" href="/styles.css" />
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="/dbug.js"></script>
+        <script>
+            
+            $(function(){
+
+                // Connect to the socket server
+                var socket = io.connect('http://localhost:8234');
+
+                // Bind to the system event
+                socket.on('system', function (data) {
+
+                    // Write out any status reports to the console
+                    dbug.log(data.status);
+                    dbug.log('Session ID: ' + data.id);
+
+                });
+
+                // Bind to the click event on the canvas div
+                $('#canvas').on('click', function(e) {
+
+                    // Get the click co-ordinates relative to the div
+                    var offset = $(this).offset(); 
+                    var relX = e.pageX - offset.left;
+                    var relY = e.pageY - offset.top;
+
+                    // Fire a canvasclicked event which will be handled by the socket server
+                    socket.emit('canvasclicked', { x: relX, y: relY });
+
+                });
+
+            });
+
+        </script>
+    </head>
+    <body>
+        <h1>Real time with Socket.io and Node.js - Controller</h1>
+        <div id="canvas"></div> 
+        <div id="console"></div> 
+    </body>
+</html>
